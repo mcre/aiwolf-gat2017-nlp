@@ -50,7 +50,7 @@ public class Starter {
 	}
 	
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException  {
-        startServer(10000, 100);
+        startServer(10000, 1);
 		startClient("localhost", 10000, 5);
 	}
 
