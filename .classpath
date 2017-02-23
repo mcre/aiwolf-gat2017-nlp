@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/aiwolf-client.jar"/>
-	<classpathentry kind="lib" path="lib/aiwolf-common.jar"/>
-	<classpathentry kind="lib" path="lib/aiwolf-server.jar"/>
-	<classpathentry kind="lib" path="lib/aiwolf-viewer.jar"/>
+	<classpathentry kind="lib" path="lib/aiwolf-client.jar" sourcepath="/aiwolf-gat2017/lib/src/AIWolfClient-0.4.x"/>
+	<classpathentry kind="lib" path="lib/aiwolf-common.jar" sourcepath="/aiwolf-gat2017/lib/src/AIWolfCommon-0.4.x"/>
+	<classpathentry kind="lib" path="lib/aiwolf-server.jar" sourcepath="/aiwolf-gat2017/lib/src/AIWolfServer-0.4.x"/>
+	<classpathentry kind="lib" path="lib/aiwolf-viewer.jar" sourcepath="/aiwolf-gat2017/lib/src/AIWolfViewer-0.4.x"/>
 	<classpathentry kind="lib" path="lib/jackson-core-2.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-databind-2.8.5.jar"/>
 	<classpathentry kind="lib" path="lib/java-juman-knp.jar"/>
