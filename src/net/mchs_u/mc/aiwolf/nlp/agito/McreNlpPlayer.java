@@ -10,7 +10,8 @@ import net.mchs_u.mc.aiwolf.nlp.common.NaturalLanguageToProtocol;
 import net.mchs_u.mc.aiwolf.nlp.common.ProtocolToNaturalLanguage;
 
 public class McreNlpPlayer implements Player {
-	private Player player;
+	private Player player = null;
+	private GameInfo gameInfo = null;
 	private ProtocolToNaturalLanguage mouth;
 	private NaturalLanguageToProtocol ear;
 
@@ -25,14 +26,21 @@ public class McreNlpPlayer implements Player {
 	}
 	
 	public String talk() {
-		return mouth.toNaturalLanguage(player.talk());
+		String pr = player.talk();
+		String nl = mouth.toNaturalLanguageForTalk(gameInfo, pr);
+		System.out.println("☆ " + pr + " -> " + nl);
+		return nl;
 	}
 	
 	public String whisper() {
-		return mouth.toNaturalLanguage(player.whisper());
+		String pr = player.whisper();
+		String nl = mouth.toNaturalLanguageForWhisper(gameInfo, pr);
+		System.out.println("★ " + pr + " -> " + nl);
+		return nl;
 	}
 	
 	public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
+		this.gameInfo = gameInfo;
 		player.initialize(gameInfo, gameSetting);
 	}
 	
