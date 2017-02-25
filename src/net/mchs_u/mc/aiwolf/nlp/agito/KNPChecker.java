@@ -148,7 +148,7 @@ public class KNPChecker {
 			System.out.print((i++) + ": " + clausea.get("clausea").asText());
 			System.out.println(getTargetClausea(clausea.get("target").asText(), clauseas));
 			System.out.println("   " + clausea.get("attributes"));
-			
+
 			Iterator<JsonNode> phrasesIterator = clausea.get("phrases").elements();
 			while(phrasesIterator.hasNext()) {
 				JsonNode phrase = phrasesIterator.next();				
@@ -160,7 +160,11 @@ public class KNPChecker {
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		verySimple("僕は人狼だよ");
+		String talk = "Ａｇｅｎｔ［０５］さんを占ったら人間だったよ";
+		
+		detail(talk);
+		System.out.println("---------");
+		verySimple(talk);
 	}
 
 }
