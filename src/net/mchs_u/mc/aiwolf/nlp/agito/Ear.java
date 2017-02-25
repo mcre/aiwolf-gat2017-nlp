@@ -16,6 +16,9 @@ import com.mychaelstyle.nlp.KNP;
 
 import net.mchs_u.mc.aiwolf.nlp.common.NaturalLanguageToProtocol;
 
+// TODO 5人人狼以外も考慮する場合
+// 霊能結果認識の実装
+// Whisperの実装
 public class Ear implements NaturalLanguageToProtocol{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
@@ -27,7 +30,7 @@ public class Ear implements NaturalLanguageToProtocol{
 		translatedMap = load();
 	}
 
-	public String toProtocol(GameInfo gameInfo, String naturalLanguage) {		
+	public String toProtocolForTalk(GameInfo gameInfo, String naturalLanguage) {		
 		if(translatedMap.containsKey(naturalLanguage)) {
 			return translatedMap.get(naturalLanguage);
 		} else if(naturalLanguage.contains(Talk.SKIP)) {
@@ -49,7 +52,6 @@ public class Ear implements NaturalLanguageToProtocol{
 			
 			// 役職カミングアウト
 			// 占い結果
-			// 霊能結果 // ５人人狼では不要
 			// 投票依頼（誰からでもいい）
 
 		} catch(Exception e) {
@@ -59,6 +61,10 @@ public class Ear implements NaturalLanguageToProtocol{
 		
 		translatedMap.put(naturalLanguage, ret);
 		return ret;
+	}
+	
+	public String toProtocolForWhisper(GameInfo gameInfo, String naturalLanguage) {		
+		return Talk.SKIP;
 	}
 
 	// juman辞書に半角文字登録できなさそうなので
