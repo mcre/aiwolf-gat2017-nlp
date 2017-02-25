@@ -30,7 +30,7 @@ public class Ear implements NaturalLanguageToProtocol{
 		translatedMap = load();
 	}
 
-	public String toProtocolForTalk(GameInfo gameInfo, String naturalLanguage) {		
+	public String toProtocolForTalk(GameInfo gameInfo, String naturalLanguage) {
 		if(translatedMap.containsKey(naturalLanguage)) {
 			return translatedMap.get(naturalLanguage);
 		} else if(naturalLanguage.contains(Talk.SKIP)) {
@@ -45,6 +45,7 @@ public class Ear implements NaturalLanguageToProtocol{
 		
 		try {
 			String nl = naturalLanguage;
+			nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			ObjectNode json = knp.parse(nl);
 			
@@ -78,6 +79,11 @@ public class Ear implements NaturalLanguageToProtocol{
 				sb.setCharAt(i, '［');
 			if (c == ']')
 				sb.setCharAt(i, '］');
+			if (c == ' ')
+				sb.setCharAt(i, '、');
+			if (c == '　')
+				sb.setCharAt(i, '、');
+			
 		}
 		value = sb.toString();
 		return value;
