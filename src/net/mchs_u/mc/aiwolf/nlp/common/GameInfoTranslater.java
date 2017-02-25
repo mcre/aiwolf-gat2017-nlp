@@ -24,14 +24,14 @@ public class GameInfoTranslater extends GameInfo {
 	public List<Talk> getTalkList() {
 		List<Talk> ret = new ArrayList<>();
 		for(Talk t: gameInfo.getTalkList())
-			ret.add(new Talk(t.getIdx(), t.getDay(), t.getTurn(), t.getAgent(), naturalLanguageToProtocol.toProtocol(t.getText())));
+			ret.add(new Talk(t.getIdx(), t.getDay(), t.getTurn(), t.getAgent(), naturalLanguageToProtocol.toProtocol(this, t.getText())));
 		return ret;
 	}
 	
 	public List<Talk> getWhisperList() {
 		List<Talk> ret = new ArrayList<>();
 		for(Talk t: gameInfo.getWhisperList())
-			ret.add(new Talk(t.getIdx(), t.getDay(), t.getTurn(), t.getAgent(), naturalLanguageToProtocol.toProtocol(t.getText())));
+			ret.add(new Talk(t.getIdx(), t.getDay(), t.getTurn(), t.getAgent(), naturalLanguageToProtocol.toProtocol(this, t.getText())));
 		return ret;
 	}
 	

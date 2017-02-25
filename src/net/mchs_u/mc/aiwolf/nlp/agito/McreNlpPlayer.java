@@ -6,14 +6,12 @@ import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
 import net.mchs_u.mc.aiwolf.nlp.common.GameInfoTranslater;
-import net.mchs_u.mc.aiwolf.nlp.common.NaturalLanguageToProtocol;
-import net.mchs_u.mc.aiwolf.nlp.common.ProtocolToNaturalLanguage;
 
 public class McreNlpPlayer implements Player {
 	private Player player = null;
 	private GameInfo gameInfo = null;
-	private ProtocolToNaturalLanguage mouth;
-	private NaturalLanguageToProtocol ear;
+	private Mouth mouth;
+	private Ear ear;
 
 	public McreNlpPlayer() {
 		player = new net.mchs_u.mc.aiwolf.curry.McrePlayer();
@@ -22,7 +20,8 @@ public class McreNlpPlayer implements Player {
 	}
 	
 	public void update(GameInfo gameInfo) {
-		player.update(new GameInfoTranslater(gameInfo, ear));
+		GameInfo prGameInfo = new GameInfoTranslater(gameInfo, ear);
+		player.update(prGameInfo);
 	}
 	
 	public String talk() {
@@ -57,6 +56,7 @@ public class McreNlpPlayer implements Player {
 	}
 
 	public void finish() {
+		ear.save();
 		player.finish();
 	}
 
