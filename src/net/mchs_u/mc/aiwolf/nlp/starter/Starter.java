@@ -45,12 +45,12 @@ public class Starter {
 		for(int i = 0; i < num; i++) {
 			TcpipClient client = new TcpipClient(host, port);
 			client.connect(new McreNlpPlayer());
-			client.setName("m_cre" + (i == 0 ? "" : "_" + i));
+			client.setName("m_cre");
 		}
 	}
 	
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException  {
-        startServer(10000, 1000);
+        startServer(10000, 1);
 		startClient("localhost", 10000, 5);
 	}
 
