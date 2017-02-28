@@ -203,6 +203,20 @@ public class Clausea {
 	public boolean isNegative() {
 		return negative;
 	}
+	
+	public static Clausea findAttributeClausea(List<Clausea> clauseas, String attribute) {
+		for(Clausea clausea: clauseas)
+			if(clausea.attributes.contains(attribute))
+				return clausea;
+		return null;
+	}
+	
+	public static Clausea findAiwolfTypeClausea(List<Clausea> clauseas, String type) {
+		for(Clausea clausea: clauseas)
+			if(clausea.aiwolfWordType != null && clausea.aiwolfWordType.equals(type))
+				return clausea;
+		return null;
+	}
 
 	@Override
 	public String toString() {
@@ -271,7 +285,10 @@ public class Clausea {
 		//String talk = "いみがわからないんだけど";
 		//String talk = "意味がわからないんだけど";
 		//String talk = "わたしは人狼のことを知らない";
-		String talk = "実は、私が占い師です。";
+		//String talk = "今日はＡｇｅｎｔ［０１］を吊ってね";
+		//String talk = "今日はＡｇｅｎｔ［０１］に投票してください";
+		String talk = "Ａｇｅｎｔ［０１］さんは人狼だったよ";
+		
 		
 		
 		List<Clausea> list = Clausea.createClauseas(talk);

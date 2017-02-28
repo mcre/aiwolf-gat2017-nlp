@@ -5,15 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.aiwolf.client.lib.ComingoutContentBuilder;
 import org.aiwolf.client.lib.Content;
@@ -26,9 +20,6 @@ import org.aiwolf.common.data.Species;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.mychaelstyle.nlp.KNP;
-
 import net.mchs_u.mc.aiwolf.nlp.common.NaturalLanguageToProtocol;
 
 // TODO 5人人狼以外も考慮する場合
@@ -38,28 +29,22 @@ import net.mchs_u.mc.aiwolf.nlp.common.NaturalLanguageToProtocol;
 public class Ear implements NaturalLanguageToProtocol{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
-	private KNP knp = null;
 	private Map<String, String> translatedMap = null; 
 
 	public Ear() {
-		knp = new KNP();
 		translatedMap = load();
 	}
 	
-	// TODO もっときれいに認識できないか？
-	// TODO コードが長すぎて見にくい
-	// TODO 占いかCOかは、対象「ガ・ヲ」が自分か、そうじゃないかで分けるのが良さそう。過去形使ってもいいけど
-	// TODO 解析結果にもっとヒントが隠れてないか
-	// TODO いろんな言い回しでうまく変換できるかを確認したい
-
 	public String toProtocolForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
-		if(translatedMap.containsKey(naturalLanguage)) {
-			return translatedMap.get(naturalLanguage);
+		String key = talker + ":" + naturalLanguage;
+		
+		if(translatedMap.containsKey(key)) {
+			return translatedMap.get(key);
 		} else if(naturalLanguage.contains(Talk.SKIP)) {
-			translatedMap.put(naturalLanguage, Talk.SKIP);
+			translatedMap.put(key, Talk.SKIP);
 			return Talk.SKIP;
 		} else if(naturalLanguage.contains(Talk.OVER)) {
-			translatedMap.put(naturalLanguage, Talk.OVER);
+			translatedMap.put(key, Talk.OVER);
 			return Talk.OVER;
 		}
 		
@@ -69,117 +54,76 @@ public class Ear implements NaturalLanguageToProtocol{
 			String nl = naturalLanguage;
 			nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
-			JsonNode clauseas = knp.parse(nl).get("clauseas");
-			
-			if(clauseas.toString().contains("人狼知能,役職")) { // 役職CO・占い結果 の処理
-				for(JsonNode clausea: getTaggedClauseas(clauseas, "人狼知能,役職")) {
-					Set<String> atts = new HashSet<>();
-					for(JsonNode att: clausea.get("attributes"))
-						atts.add(att.asText());
-					
-					if(atts.contains("状態述語") && atts.contains("時制-過去") && !atts.contains("否定表現")) {
-						Agent target = getAgent(gameInfo, talker, getKakukankei(clausea, 'ガ'));							
-						if(target != null) {
-							Species result = null;
-							if(clausea.toString().contains("人狼知能,役職,人狼"))
-								result = Species.WEREWOLF;
-							else if(clausea.toString().contains("人狼知能,役職,人間"))
-								result = Species.HUMAN;
-							ret = new Content(new DivinedResultContentBuilder(target, result)).getText();	
-						}
-					} else if(atts.contains("状態述語") && !atts.contains("否定表現")) {
-						Agent target = getAgent(gameInfo, talker, getKakukankei(clausea, 'ガ'));							
-						if(target != null) {
-							Role role = null;
-							if(clausea.toString().contains("人狼知能,役職,占い師"))
-								role = Role.SEER;
-							else if(clausea.toString().contains("人狼知能,役職,人狼"))
-								role = Role.WEREWOLF;
-							else if(clausea.toString().contains("人狼知能,役職,狂人"))
-								role = Role.POSSESSED;
-							else if(clausea.toString().contains("人狼知能,役職,人間"))
-								role = Role.VILLAGER;
-							ret = new Content(new ComingoutContentBuilder(target, role)).getText();	
-						}
-					}
-				}
-			} else if(clauseas.toString().contains("人狼知能,行為,投票")) { // 投票依頼 の処理
-				for(JsonNode clausea: getTaggedClauseas(clauseas, "人狼知能,行為,投票")) {
-					Set<String> atts = new HashSet<>();
-					for(JsonNode att: clausea.get("attributes"))
-						atts.add(att.asText());
-					if(atts.contains("モダリティ-依頼Ａ") && !atts.contains("否定表現")) {
-						Agent target = getAgent(gameInfo, talker, getKakukankei(clausea, 'ニ'));							
-						if(target != null)	
-							ret = new Content(new RequestContentBuilder(null, new Content(new VoteContentBuilder(target)))).getText();
-					}
-				}
-			}
 
+			Content content = talkToContent(gameInfo, talker, Clausea.createClauseas(nl));
+			if(content == null)
+				ret = Talk.SKIP;
+			else
+				ret = content.getText();
 		} catch(Exception e) {
 			e.printStackTrace();
 			ret = Talk.SKIP;
 		}
 		
-		translatedMap.put(naturalLanguage, ret);
+		translatedMap.put(key, ret);
 		return ret;
+	}
+	
+	private Content talkToContent(GameInfo gameInfo, Agent talker, List<Clausea> clauseas) {
+		Clausea roleClausea = Clausea.findAiwolfTypeClausea(clauseas, "役職");
+		Clausea actionClausea = Clausea.findAiwolfTypeClausea(clauseas, "行為");
+		
+		if(roleClausea != null && !roleClausea.isNegative()) {				
+			// ☆役職CO
+			// 「私は占い師です」
+			if(roleClausea.getKakuMap().get("ガ").getAttributes().contains("一人称")) {
+				switch (roleClausea.getAiwolfWordMeaning()) {
+				case "占い師":	return new Content(new ComingoutContentBuilder(talker, Role.SEER));
+				case "人狼":		return new Content(new ComingoutContentBuilder(talker, Role.WEREWOLF));
+				case "狂人":		return new Content(new ComingoutContentBuilder(talker, Role.POSSESSED));
+				case "人間":		return new Content(new ComingoutContentBuilder(talker, Role.VILLAGER));
+				default:		return null;
+				}
+			}
+			
+			// ☆占い結果
+			// 「Agent[04]さんは人狼です」
+			if(roleClausea.getKakuMap().get("ガ").getAiwolfWordType().equals("プレイヤー")) {
+				Agent target = gameInfo.getAgentList().get(Integer.parseInt(roleClausea.getKakuMap().get("ガ").getAiwolfWordMeaning()));
+				switch (roleClausea.getAiwolfWordMeaning()) {
+				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
+				case "人間":		return new Content(new DivinedResultContentBuilder(target, Species.HUMAN));
+				default: 		return null;
+				}
+			}
+			
+		} else if(actionClausea != null && !actionClausea.isNegative()) {
+			if(actionClausea.getAiwolfWordMeaning().equals("投票")) {
+				// ☆投票依頼
+				// 「Agent[04]さんに投票してください」
+				if(actionClausea.getAttributes().contains("モダリティ-依頼Ａ")) {
+					int agentId = -1;
+					if(actionClausea.getKakuMap().get("ニ").getAiwolfWordType().equals("プレイヤー"))
+						agentId = Integer.parseInt(actionClausea.getKakuMap().get("ニ").getAiwolfWordMeaning());
+					else if(actionClausea.getKakuMap().get("ヲ").getAiwolfWordType().equals("プレイヤー"))
+						agentId = Integer.parseInt(actionClausea.getKakuMap().get("ヲ").getAiwolfWordMeaning());
+						
+					if(agentId >= 0) {
+						Agent target = gameInfo.getAgentList().get(agentId);
+						if(target != null)	
+							return new Content(new RequestContentBuilder(null, new Content(new VoteContentBuilder(target))));
+					}
+				}	
+			}
+		}
+		
+		return null;
 	}
 	
 	public String toProtocolForWhisper(GameInfo gameInfo, Agent talker, String naturalLanguage) {		
 		return Talk.SKIP;
 	}
 	
-	private static boolean isFirstPersonPronoun(String s) {
-		KNP knp = new KNP();
-		try {
-			return knp.parse(s).toString().contains("一人称");
-		} catch (IOException | InterruptedException e) {
-			return false;
-		}
-	}
-	
-	private static Agent getAgent(GameInfo gameInfo, Agent talker, String zenkaku) {
-		if(zenkaku == null)
-			return null;
-		
-		if(isFirstPersonPronoun(zenkaku))
-			return talker;
-		
-		Agent agent = null;
-		switch (zenkaku) {
-		case "Ａｇｅｎｔ［０１］": agent = gameInfo.getAgentList().get(0); break;
-		case "Ａｇｅｎｔ［０２］": agent = gameInfo.getAgentList().get(1); break;
-		case "Ａｇｅｎｔ［０３］": agent = gameInfo.getAgentList().get(2); break;
-		case "Ａｇｅｎｔ［０４］": agent = gameInfo.getAgentList().get(3); break;
-		case "Ａｇｅｎｔ［０５］": agent = gameInfo.getAgentList().get(4); break;
-		default: break;
-		}
-		
-		return agent;
-	}
-	
-	private static List<JsonNode> getTaggedClauseas(JsonNode clauseas, String tag) {
-		List<JsonNode> ret = new ArrayList<>();
-		Iterator<JsonNode> clauseasIterator =  clauseas.elements();
-		
-		while(clauseasIterator.hasNext()) {		
-			JsonNode clausea = clauseasIterator.next();
-			if(clausea.toString().contains(tag)) {
-				ret.add(clausea);
-			}
-		}
-		return ret;
-	}
-	
-	// 手抜き
-	private static String getKakukankei(JsonNode clausea, char teniwoha) {
-		String regex = "\"格関係.\":\"" + teniwoha + ":(.*?)\"";
-		Matcher m = Pattern.compile(regex).matcher(clausea.toString());
-		if(m.find())
-			return m.group(1);
-		return null;
-	}
-
 	// juman辞書に半角文字登録できなさそうなので
 	private static String hankakuToZenkaku(String value) {
 		StringBuilder sb = new StringBuilder(value);
