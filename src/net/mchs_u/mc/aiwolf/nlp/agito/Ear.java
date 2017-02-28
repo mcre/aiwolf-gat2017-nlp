@@ -52,9 +52,10 @@ public class Ear implements NaturalLanguageToProtocol{
 		
 		try {
 			String nl = naturalLanguage;
+			
 			nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
-
+			
 			Content content = talkToContent(gameInfo, talker, Clausea.createClauseas(nl));
 			if(content == null)
 				ret = Talk.SKIP;
@@ -70,43 +71,75 @@ public class Ear implements NaturalLanguageToProtocol{
 	}
 	
 	private Content talkToContent(GameInfo gameInfo, Agent talker, List<Clausea> clauseas) {
-		Clausea roleClausea = Clausea.findAiwolfTypeClausea(clauseas, "役職");
+		Clausea roleClausea   = Clausea.findAiwolfTypeClausea(clauseas, "役職");
+		Clausea roleCoClausea = Clausea.findAiwolfTypeClausea(clauseas, "役職CO");
 		Clausea actionClausea = Clausea.findAiwolfTypeClausea(clauseas, "行為");
+		Clausea playerClausea = Clausea.findAiwolfTypeClausea(clauseas, "プレイヤー");
+		Clausea tmp = null;
+		
+		if(playerClausea != null && roleClausea != null && actionClausea != null) {
+			// ☆占い結果「Agent[04]さんを占ったら人狼でした」「昨日の占い結果です。Agent[04]さんは人狼でした」
+			// 一文に、プレイヤー、占い、人＊でした、があれば占い結果とする
+			if(
+					actionClausea.getAiwolfWordMeaning().equals("占い") &&
+					roleClausea.getAiwolfWordMeaning().startsWith("人") &&
+					roleClausea.getAttributes().contains("状態述語") &&
+					!actionClausea.isNegative() && !roleClausea.isNegative()) {
+				Agent target = gameInfo.getAgentList().get(Integer.parseInt(playerClausea.getAiwolfWordMeaning()));
+				switch (roleClausea.getAiwolfWordMeaning()) {
+				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
+				case "人間":		return new Content(new DivinedResultContentBuilder(target, Species.HUMAN));
+				}
+			}
+		}
 		
 		if(roleClausea != null && !roleClausea.isNegative()) {				
-			// ☆役職CO
-			// 「私は占い師です」
-			if(roleClausea.getKakuMap().get("ガ").getAttributes().contains("一人称")) {
+			// ☆役職CO「私は占い師です」
+			tmp = roleClausea.getKakuMap().get("ガ");
+			if(tmp != null && tmp.getAttributes().contains("一人称")) {
 				switch (roleClausea.getAiwolfWordMeaning()) {
 				case "占い師":	return new Content(new ComingoutContentBuilder(talker, Role.SEER));
 				case "人狼":		return new Content(new ComingoutContentBuilder(talker, Role.WEREWOLF));
 				case "狂人":		return new Content(new ComingoutContentBuilder(talker, Role.POSSESSED));
 				case "人間":		return new Content(new ComingoutContentBuilder(talker, Role.VILLAGER));
-				default:		return null;
 				}
 			}
 			
-			// ☆占い結果
-			// 「Agent[04]さんは人狼です」
-			if(roleClausea.getKakuMap().get("ガ").getAiwolfWordType().equals("プレイヤー")) {
-				Agent target = gameInfo.getAgentList().get(Integer.parseInt(roleClausea.getKakuMap().get("ガ").getAiwolfWordMeaning()));
+			// ☆占い結果「Agent[04]さんは人狼です」
+			tmp = roleClausea.getKakuMap().get("ガ");
+			if(tmp != null && tmp.getAiwolfWordType() != null && tmp.getAiwolfWordType().equals("プレイヤー")) {
+				Agent target = gameInfo.getAgentList().get(Integer.parseInt(tmp.getAiwolfWordMeaning()));
 				switch (roleClausea.getAiwolfWordMeaning()) {
 				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
 				case "人間":		return new Content(new DivinedResultContentBuilder(target, Species.HUMAN));
-				default: 		return null;
 				}
 			}
+		}
 			
-		} else if(actionClausea != null && !actionClausea.isNegative()) {
+		if(roleCoClausea != null && !roleCoClausea.isNegative()) {
+			// ☆役職CO「占い師COします」
+			if(roleCoClausea.getAttributes().contains("動態述語")) {
+				switch (roleCoClausea.getAiwolfWordMeaning()) {
+				case "占い師":	return new Content(new ComingoutContentBuilder(talker, Role.SEER));
+				case "人狼":		return new Content(new ComingoutContentBuilder(talker, Role.WEREWOLF));
+				case "狂人":		return new Content(new ComingoutContentBuilder(talker, Role.POSSESSED));
+				case "人間":		return new Content(new ComingoutContentBuilder(talker, Role.VILLAGER));
+				}
+			}
+		}
+			
+		if(actionClausea != null && !actionClausea.isNegative()) {
 			if(actionClausea.getAiwolfWordMeaning().equals("投票")) {
-				// ☆投票依頼
-				// 「Agent[04]さんに投票してください」
+				// ☆投票依頼「Agent[04]さんに投票してください」
 				if(actionClausea.getAttributes().contains("モダリティ-依頼Ａ")) {
 					int agentId = -1;
-					if(actionClausea.getKakuMap().get("ニ").getAiwolfWordType().equals("プレイヤー"))
-						agentId = Integer.parseInt(actionClausea.getKakuMap().get("ニ").getAiwolfWordMeaning());
-					else if(actionClausea.getKakuMap().get("ヲ").getAiwolfWordType().equals("プレイヤー"))
-						agentId = Integer.parseInt(actionClausea.getKakuMap().get("ヲ").getAiwolfWordMeaning());
+					tmp = actionClausea.getKakuMap().get("ニ");
+					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
+						agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
+					
+					tmp = actionClausea.getKakuMap().get("ヲ");
+					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
+						agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
 						
 					if(agentId >= 0) {
 						Agent target = gameInfo.getAgentList().get(agentId);

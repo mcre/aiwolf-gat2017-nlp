@@ -30,7 +30,15 @@ public class Mouth implements ProtocolToNaturalLanguage {
 				return "わおーん　僕は人狼だよ";
 			return "僕は" + roleToString(content.getRole()) + "だよ";
 		case DIVINED:
-			return content.getTarget() + "さんは" + speciesToString(content.getResult()) + "だったよ";
+			switch ((int)(Math.random() * 6)) {
+			case 0: return content.getTarget() + "さんの占い結果は" + speciesToString(content.getResult()) + "だったよ";
+			case 1: return content.getTarget() + "さんの占いの結果は" + speciesToString(content.getResult()) + "だったよ";
+			case 2: return content.getTarget() + "さんを占ったら" + speciesToString(content.getResult()) + "だったよ";
+			case 3: return content.getTarget() + "さんを占った結果は" + speciesToString(content.getResult()) + "だったよ";
+			case 4: return content.getTarget() + "さんは" + speciesToString(content.getResult()) + "だったよ";
+			case 5: return "昨日の占い結果だよ　" + content.getTarget() + "さんは" + speciesToString(content.getResult()) + "だったよ";
+			
+			}
 		case IDENTIFIED:
 			return content.getTarget() + "さんの霊能結果は" + speciesToString(content.getResult()) + "だったよ";
 		case OPERATOR:
