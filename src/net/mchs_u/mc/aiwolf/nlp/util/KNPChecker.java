@@ -1,4 +1,4 @@
-package net.mchs_u.mc.aiwolf.nlp.agito;
+package net.mchs_u.mc.aiwolf.nlp.util;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mychaelstyle.nlp.KNP;
+
+import net.mchs_u.mc.aiwolf.nlp.agito.Clausea;
 
 public class KNPChecker {
 	
@@ -160,11 +162,16 @@ public class KNPChecker {
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		String talk = "Ａｇｅｎｔ［０５］さんを占ったら人間だったよ";
+		//String talk = "太郎と二郎と三郎と四郎は楽しくて嬉しい";
+		//String talk = "私の彼の頭は禿げています";
+		String talk = "私は人狼ではありません";
 		
 		detail(talk);
 		System.out.println("---------");
 		verySimple(talk);
+		System.out.println("---------");
+		for(Clausea c: Clausea.createClauseas(talk))
+			System.out.println(c);
 	}
 
 }
