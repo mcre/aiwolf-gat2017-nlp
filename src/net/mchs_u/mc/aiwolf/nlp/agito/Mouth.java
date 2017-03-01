@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.aiwolf.client.lib.Content;
@@ -26,7 +27,7 @@ public class Mouth {
 	private boolean todayVoteDeclared = false;
 	private int day = Integer.MAX_VALUE;
 
-	public String toNaturalLanguageForTalk(GameInfo gameInfo, String protocol) {
+	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol) {
 		if(!Content.validate(protocol)) {
 			System.err.println("Mouth: 内部エージェントがプロトコル以外を喋ってる -> " + protocol);
 			return Talk.SKIP;
@@ -109,7 +110,7 @@ public class Mouth {
 		return null;
 	}
 	
-	public String toNaturalLanguageForWhisper(GameInfo gameInfo, String protocol) {		
+	public String toNaturalLanguageForWhisper(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol) {		
 		if(!Content.validate(protocol)) {
 			System.err.println("Mouth: 内部エージェントがプロトコル以外を喋ってる -> " + protocol);
 			return Talk.SKIP;
