@@ -18,9 +18,7 @@ import org.aiwolf.common.data.Species;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
-import net.mchs_u.mc.aiwolf.nlp.common.ProtocolToNaturalLanguage;
-
-public class Mouth implements ProtocolToNaturalLanguage {
+public class Mouth {
 	private final static String PATH_CHATS = "dic/chats.txt";
 	private final static double CHAT_RATE = 0.3d; // 話題がないときにチャットリストを消費する確率
 	

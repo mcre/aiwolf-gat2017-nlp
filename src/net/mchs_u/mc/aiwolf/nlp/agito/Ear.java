@@ -20,13 +20,11 @@ import org.aiwolf.common.data.Species;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 
-import net.mchs_u.mc.aiwolf.nlp.common.NaturalLanguageToProtocol;
-
 // TODO 5人人狼以外も考慮する場合
 // 霊能結果認識の実装
 // Whisperの実装
 // TODO １発言で２内容来た場合片方しか対応できない（占COと同時に占い結果言う場合とか）
-public class Ear implements NaturalLanguageToProtocol{
+public class Ear{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
 	private Map<String, String> translatedMap = null; 
