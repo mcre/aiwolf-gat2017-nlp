@@ -19,11 +19,12 @@ public class McreNlpPlayer implements Player {
 
 	public McreNlpPlayer() {
 		player = new net.mchs_u.mc.aiwolf.curry.McrePlayer();
-		mouth = new Mouth();
 		ear = new Ear();
+		mouth = new Mouth();
 	}
 	
 	public void update(GameInfo gameInfo) {
+		this.gameInfo = gameInfo;
 		GameInfo prGameInfo = new GameInfoTranslater(gameInfo, ear);
 		player.update(prGameInfo);
 		
