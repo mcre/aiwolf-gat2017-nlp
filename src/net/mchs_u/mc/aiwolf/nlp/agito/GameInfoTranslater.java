@@ -1,4 +1,4 @@
-package net.mchs_u.mc.aiwolf.nlp.util;
+package net.mchs_u.mc.aiwolf.nlp.agito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,6 @@ import org.aiwolf.common.data.Status;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.data.Vote;
 import org.aiwolf.common.net.GameInfo;
-
-import net.mchs_u.mc.aiwolf.nlp.agito.Ear;
 
 public class GameInfoTranslater extends GameInfo {
 	private GameInfo gameInfo = null;

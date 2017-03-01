@@ -1,9 +1,11 @@
-package net.mchs_u.mc.aiwolf.nlp.agito;
+package net.mchs_u.mc.aiwolf.nlp.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import net.mchs_u.mc.aiwolf.nlp.agito.Ear;
 
 public class TransratedMapChecker {
 	public static void main(String[] args) {
