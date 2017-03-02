@@ -13,8 +13,6 @@ import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
-import net.mchs_u.mc.aiwolf.nlp.util.GameInfoTranslater;
-
 public class McreNlpPlayer implements Player {
 	private Player player = null;
 	private GameInfo gameInfo = null;
