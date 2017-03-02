@@ -51,12 +51,16 @@ public class Mouth {
 		}
 
 		if(day == 0) { //　0日目は特殊
-			switch ((int)(Math.random() * 4)) {
-			case 0: return "よろしくね";
-			case 1: return "こんにちは";
-			case 2: return "おはよう";
-			case 3: return "おはようございます";
+			if(!talkedSet.contains("0日目発言")){
+				talkedSet.add("0日目発言");
+				switch ((int)(Math.random() * 4)) {
+				case 0: return "よろしくね";
+				case 1: return "こんにちは";
+				case 2: return "おはよう";
+				case 3: return "おはようございます";
+				}
 			}
+			return Talk.OVER;
 		}
 
 		switch (content.getTopic()) {
