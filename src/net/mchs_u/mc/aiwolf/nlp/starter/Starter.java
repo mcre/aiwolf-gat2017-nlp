@@ -20,6 +20,7 @@ public class Starter {
 		int playerNum = 5;
 		GameSetting gameSetting = GameSetting.getDefaultGame(playerNum);
 		gameSetting.setValidateUtterance(false);
+		gameSetting.setTalkOnFirstDay(true);
 		gameSetting.setTimeLimit(5000);
 		
         new Thread() {
@@ -50,7 +51,7 @@ public class Starter {
 	}
 	
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException  {
-        startServer(10000, 1);
+        startServer(10000, 100);
 		startClient("localhost", 10000, 5);
 	}
 
