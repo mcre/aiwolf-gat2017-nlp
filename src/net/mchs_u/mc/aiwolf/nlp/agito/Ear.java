@@ -54,7 +54,7 @@ public class Ear{
 			nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			
-			Content content = talkToContent(gameInfo, talker, Clausea.createClauseas(nl));
+			Content content = talkToContent(talker, Clausea.createClauseas(nl));
 			if(content == null)
 				ret = Talk.SKIP;
 			else
@@ -68,7 +68,7 @@ public class Ear{
 		return ret;
 	}
 	
-	private Content talkToContent(GameInfo gameInfo, Agent talker, List<Clausea> clauseas) {
+	private Content talkToContent(Agent talker, List<Clausea> clauseas) {
 		Clausea roleClausea   = Clausea.findAiwolfTypeClausea(clauseas, "役職");
 		Clausea roleCoClausea = Clausea.findAiwolfTypeClausea(clauseas, "役職CO");
 		Clausea actionClausea = Clausea.findAiwolfTypeClausea(clauseas, "行為");
@@ -83,7 +83,7 @@ public class Ear{
 					roleClausea.getAiwolfWordMeaning().startsWith("人") &&
 					roleClausea.getAttributes().contains("状態述語") &&
 					!actionClausea.isNegative() && !roleClausea.isNegative()) {
-				Agent target = gameInfo.getAgentList().get(Integer.parseInt(playerClausea.getAiwolfWordMeaning()));
+				Agent target = Agent.getAgent(Integer.parseInt(playerClausea.getAiwolfWordMeaning()));
 				switch (roleClausea.getAiwolfWordMeaning()) {
 				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
 				case "人間":		return new Content(new DivinedResultContentBuilder(target, Species.HUMAN));
@@ -106,7 +106,7 @@ public class Ear{
 			// ☆占い結果「Agent[04]さんは人狼です」
 			tmp = roleClausea.getKakuMap().get("ガ");
 			if(tmp != null && tmp.getAiwolfWordType() != null && tmp.getAiwolfWordType().equals("プレイヤー") && !roleClausea.getAttributes().contains("モダリティ-疑問")) {
-				Agent target = gameInfo.getAgentList().get(Integer.parseInt(tmp.getAiwolfWordMeaning()));
+				Agent target = Agent.getAgent(Integer.parseInt(tmp.getAiwolfWordMeaning()));
 				switch (roleClausea.getAiwolfWordMeaning()) {
 				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
 				case "人間":		return new Content(new DivinedResultContentBuilder(target, Species.HUMAN));
@@ -140,7 +140,7 @@ public class Ear{
 						agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
 						
 					if(agentId >= 0) {
-						Agent target = gameInfo.getAgentList().get(agentId);
+						Agent target = Agent.getAgent(agentId);
 						if(target != null)	
 							return new Content(new RequestContentBuilder(null, new Content(new VoteContentBuilder(target))));
 					}
