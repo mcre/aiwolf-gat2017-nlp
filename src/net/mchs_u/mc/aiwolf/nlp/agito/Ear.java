@@ -33,6 +33,12 @@ public class Ear{
 		translatedMap = load();
 	}
 	
+	public void initialize(GameInfo gameInfo) {
+	}
+	
+	public void dayStart() {
+	}
+	
 	public String toProtocolForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
 		String key = talker + ":" + naturalLanguage;
 		

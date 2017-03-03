@@ -32,8 +32,15 @@ public class Mouth {
 	private List<String> posiChats = null;
 	private List<String> seerChats = null;
 
-	private int day = Integer.MAX_VALUE;
 	private Set<String> talkedSet = null;
+	
+	public void initialize(GameInfo gameInfo) {
+		talkedSet = new HashSet<>();
+		loadChats(new Random((new Date()).getTime() + gameInfo.getAgent().getAgentIdx() * 222));
+	}
+	
+	public void dayStart() {
+	}
 
 	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol) {
 		if(!Content.validate(protocol)) {
@@ -42,15 +49,7 @@ public class Mouth {
 		}
 		Content content = new Content(protocol);
 
-		if(gameInfo.getDay() != day) { //日付変わった
-			if(gameInfo.getDay() < day) { //ニューゲーム
-				talkedSet = new HashSet<>();
-				loadChats(new Random((new Date()).getTime() + gameInfo.getAgent().getAgentIdx() * 222));
-			}
-			day = gameInfo.getDay();
-		}
-
-		if(day == 0) { //　0日目は特殊
+		if(gameInfo.getDay() == 0) { //　0日目は特殊
 			if(!talkedSet.contains("0日目発言")){
 				talkedSet.add("0日目発言");
 				switch ((int)(Math.random() * 4)) {

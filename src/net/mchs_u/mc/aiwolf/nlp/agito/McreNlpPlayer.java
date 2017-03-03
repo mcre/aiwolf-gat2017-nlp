@@ -64,11 +64,15 @@ public class McreNlpPlayer implements Player {
 	public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
 		coMap = new HashMap<>();
 		player.initialize(gameInfo, gameSetting);
+		mouth.initialize(gameInfo);
+		ear.initialize(gameInfo);
 	}
 	
 	public void dayStart() {
 		listHead = 0;
 		player.dayStart();
+		mouth.dayStart();
+		ear.dayStart();
 	}
 
 	public Agent attack() {
