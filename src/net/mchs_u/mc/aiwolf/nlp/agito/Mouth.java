@@ -154,7 +154,7 @@ public class Mouth {
 					switch ((int)(Math.random() * 5)) {
 					case 0: return t + "さんは嘘をついています！";
 					case 1: return t + "さんは嘘つきです！";
-					case 2: return ">>" + t + " " + t + "さん、あなたが人狼だったんですね！";
+					case 2: return ">>" + t + " " + t + "さん、あなたが人狼なんですか！？";
 					}
 				}
 			}
