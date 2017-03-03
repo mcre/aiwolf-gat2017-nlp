@@ -53,11 +53,13 @@ public class Mouth {
 		if(gameInfo.getDay() == 0) { //　0日目は特殊
 			if(!talkedSet.contains("0日目発言")){
 				talkedSet.add("0日目発言");
-				switch ((int)(Math.random() * 4)) {
-				case 0: return "よろしくね";
-				case 1: return "こんにちは";
-				case 2: return "おはよう";
-				case 3: return "おはようございます";
+				switch ((int)(Math.random() * 6)) {
+				case 0: return "よろしくね。";
+				case 1: return "こんにちは。";
+				case 2: return "おはよう！";
+				case 3: return "おはようございます。";
+				case 4: return "頑張ります!";
+				case 5: return "死なないように頑張ります。";
 				}
 			}
 			return Talk.OVER;
