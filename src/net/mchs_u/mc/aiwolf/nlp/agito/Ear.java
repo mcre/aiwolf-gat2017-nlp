@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class Ear{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
 	private Map<String, String> translatedMap = null; 
-	private List<String> answers = null; // Mouthに渡す質問への返答集
+	private Map<String, String> qas = null; // Mouthに渡すQA集
 
 	public Ear() {
 		translatedMap = load();
@@ -39,7 +39,7 @@ public class Ear{
 	}
 	
 	public void dayStart() {
-		answers = new ArrayList<>();
+		qas = new HashMap<>();
 	}
 	
 	public String toProtocolForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
@@ -60,10 +60,14 @@ public class Ear{
 		try {
 			String nl = naturalLanguage;
 			
+			Agent questionTo = null;
+			if(naturalLanguage.startsWith(">>Agent["))
+				questionTo = Agent.getAgent(Integer.parseInt(naturalLanguage.substring(8, 10)));
+			
 			nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			
-			Content content = talkToContent(talker, Clausea.createClauseas(nl));
+			Content content = talkToContent(gameInfo, talker, questionTo, Clausea.createClauseas(nl));
 			if(content == null)
 				ret = Talk.SKIP;
 			else
@@ -77,7 +81,7 @@ public class Ear{
 		return ret;
 	}
 	
-	private Content talkToContent(Agent talker, List<Clausea> clauseas) {
+	private Content talkToContent(GameInfo gameInfo, Agent talker, Agent questionTo, List<Clausea> clauseas) {
 		Clausea roleClausea   = Clausea.findAiwolfTypeClausea(clauseas, "役職");
 		Clausea roleCoClausea = Clausea.findAiwolfTypeClausea(clauseas, "役職CO");
 		Clausea actionClausea = Clausea.findAiwolfTypeClausea(clauseas, "行為");
@@ -157,6 +161,13 @@ public class Ear{
 			}
 		}
 		
+		if(questionTo == gameInfo.getAgent()) {
+			// TODO 問いかけの処理
+			// TODO 一回処理した問いかけはSkipで保存されちゃうからどうしようか。リプライ付きは保存しないようにするか、自分宛てリプはもう一回まわすようにするか。
+			// でも今は1日分まるごと回す処理してるからまずいぞ。
+			
+		}
+		
 		return null;
 	}
 	
@@ -185,8 +196,8 @@ public class Ear{
 		return value;
 	}
 	
-	public List<String> getAnswers() {
-		return answers;
+	public Collection<String> getAnswers() {
+		return qas.values();
 	}
 
 	@SuppressWarnings("unchecked")

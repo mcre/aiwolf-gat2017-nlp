@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -42,7 +43,7 @@ public class Mouth {
 	public void dayStart() {
 	}
 
-	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol, List<String> answers) {
+	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol, Collection<String> answers) {
 		if(!Content.validate(protocol)) {
 			System.err.println("Mouth: 内部エージェントがプロトコル以外を喋ってる -> " + protocol);
 			return Talk.SKIP;
@@ -113,7 +114,7 @@ public class Mouth {
 		return ret;
 	}
 
-	private String skipTalk(GameInfo gameInfo, Map<Agent, Role> coMap, List<String> answers) {
+	private String skipTalk(GameInfo gameInfo, Map<Agent, Role> coMap, Collection<String> answers) {
 		if(countCoMap(coMap, Role.WEREWOLF) > 0) { // PPモード 
 			if(!talkedSet.contains("パワープレイ反応")){
 				talkedSet.add("パワープレイ反応");
