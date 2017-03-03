@@ -47,8 +47,8 @@ public class McreNlpPlayer implements Player {
 	
 	public String talk() {
 		String pr = Talk.SKIP;
-		if(gameInfo.getDay() > 0)
-			pr = player.talk(); // 0日目はプロトコル版のtalkを呼ばない
+		if(gameInfo.getDay() > 0 && gameInfo.getTalkList().size() > 0)
+			pr = player.talk(); // 0日目とその日１回目のtalkはプロトコル版のtalkを呼ばない
 		String nl = mouth.toNaturalLanguageForTalk(gameInfo, coMap, pr);
 		System.out.println("　●talk: " + gameInfo.getAgent() + " " + getName() + "\t" + nl + " ( <- " + pr + " ) ");
 		return nl;
