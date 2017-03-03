@@ -42,7 +42,7 @@ public class Mouth {
 	public void dayStart() {
 	}
 
-	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol) {
+	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol, List<String> answers) {
 		if(!Content.validate(protocol)) {
 			System.err.println("Mouth: 内部エージェントがプロトコル以外を喋ってる -> " + protocol);
 			return Talk.SKIP;
@@ -66,7 +66,7 @@ public class Mouth {
 		case OVER:
 			return Talk.OVER;
 		case SKIP:
-			return skipTalk(gameInfo, coMap);
+			return skipTalk(gameInfo, coMap, answers);
 		case COMINGOUT:
 			if(!content.getTarget().equals(gameInfo.getAgent()))
 				return Talk.SKIP;
@@ -113,10 +113,7 @@ public class Mouth {
 		return ret;
 	}
 
-	private String skipTalk(GameInfo gameInfo, Map<Agent, Role> coMap) {
-		// TODO
-		// ◯質問に答える
-		// ⇒耳側との分担をどうするか
+	private String skipTalk(GameInfo gameInfo, Map<Agent, Role> coMap, List<String> answers) {
 		if(countCoMap(coMap, Role.WEREWOLF) > 0) { // PPモード 
 			if(!talkedSet.contains("パワープレイ反応")){
 				talkedSet.add("パワープレイ反応");
@@ -167,6 +164,13 @@ public class Mouth {
 				switch ((int)(Math.random() * 5)) {
 				case 0: return "どっちが本当の占い師なんだろう……。";
 				}
+			}
+		}
+		
+		for(String answer: answers) { //Earから渡されたAnswer
+			if(!talkedSet.contains("answer:" + answer)){
+				talkedSet.add("answer:" + answer);
+				return answer;
 			}
 		}
 

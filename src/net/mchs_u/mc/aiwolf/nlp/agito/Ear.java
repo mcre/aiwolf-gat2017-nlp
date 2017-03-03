@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class Ear{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
 	private Map<String, String> translatedMap = null; 
+	private List<String> answers = null; // Mouthに渡す質問への返答集
 
 	public Ear() {
 		translatedMap = load();
@@ -37,6 +39,7 @@ public class Ear{
 	}
 	
 	public void dayStart() {
+		answers = new ArrayList<>();
 	}
 	
 	public String toProtocolForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
@@ -180,6 +183,10 @@ public class Ear{
 		}
 		value = sb.toString();
 		return value;
+	}
+	
+	public List<String> getAnswers() {
+		return answers;
 	}
 
 	@SuppressWarnings("unchecked")
