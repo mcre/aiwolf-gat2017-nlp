@@ -23,7 +23,7 @@ public class Clausea {
 	private Clausea paraForward = null;
 	private Clausea paraBack = null;
 	
-	private String modality = null;
+	private Set<String> modalities = null;
 	private String kaku = null;
 	private Map<String, Clausea> kakuMap = null;
 	
@@ -43,6 +43,7 @@ public class Clausea {
 		attributes = new HashSet<>();
 		parents = new HashSet<>();
 		kakuMap = new HashMap<>();
+		modalities = new HashSet<>();
 	}
 	
 	private void addSignage(String signage) {
@@ -69,7 +70,7 @@ public class Clausea {
 			kaku = att.replace("{解析格:", "").replace("}", "");
 		
 		if(att.startsWith("モダリティ-"))
-			modality = att.replace("モダリティ-", "");
+			modalities.add(att.replace("モダリティ-", ""));
 	}
 	
 	private void createKakuMap(List<Clausea> clauseas) {
@@ -203,17 +204,24 @@ public class Clausea {
 		return aiwolfWordMeaning;
 	}
 	
-	public String getModality() {
-		return modality;
+	public Set<String> getModalities() {
+		return modalities;
 	}
 
 	public boolean isNegative() {
 		return negative;
 	}
 	
+	public static Clausea findMainClausea(List<Clausea> clauseas, String main) {
+		for(Clausea clausea: clauseas)
+			if(clausea.main.equals(main))
+				return clausea;
+		return null;
+	}
+	
 	public static Clausea findModalityClausea(List<Clausea> clauseas, String modality) {
 		for(Clausea clausea: clauseas)
-			if(clausea.modality.equals(modality))
+			if(clausea.modalities.contains(modality))
 				return clausea;
 		return null;
 	}	
@@ -262,8 +270,8 @@ public class Clausea {
 			sb.append("☆" + aiwolfWordType + " = " + aiwolfWordMeaning + "\n");
 		if(negative)
 			sb.append("・否定\n");
-		if(modality != null)
-			sb.append("モダリティ = " + modality + "\n");
+		for(String m: modalities)
+			sb.append("モダリティ = " + m + "\n");
 		
 		sb.append("　　" + attributes + "\n");
 		
@@ -304,7 +312,7 @@ public class Clausea {
 		//talk = "意味がわからないんだけど";
 		//talk = "わたしは人狼のことを知らない";
 		//talk = "今日はＡｇｅｎｔ［０１］を吊ってね";
-		//talk = "今日はＡｇｅｎｔ［０１］に投票してください";
+		talk = "今日はＡｇｅｎｔ［０１］さんに投票してください";
 		//talk = "Ａｇｅｎｔ［０１］さんは人狼だったよ";
 		//talk = "人狼ＣＯします";
 		//talk = "人狼ＣＯするよ";
@@ -314,8 +322,15 @@ public class Clausea {
 		//talk = "Ａｇｅｎｔ［０１］さんの占いの結果は人狼だったよ";
 		//talk = "Ａｇｅｎｔ［９９］さんが人狼なんでしょ？";
 		//talk = "Ａｇｅｎｔ［９９］さん、いっしょに遊ぼうよ！";
-		//talk = "誰が人狼だと思う？";
+		//talk = "君は誰が人狼だと思う？";
 		//talk = "今日はＡｇｅｎｔ［０１］に投票しましょうよ";
+		//talk = "彼は人狼らしいよ";
+		//talk = "彼は人狼かもしれない";
+		//talk = "彼は人狼だろう";
+		//talk = "彼は人狼だというわけだ。";
+		//talk = "君が人狼なんでしょう？";
+		//talk = "人狼は誰だと思う？";
+		//talk = "君が犯人なんだろう？";
 		
 		List<Clausea> list = Clausea.createClauseas(talk);
 		for(Clausea c: list) {

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.aiwolf.client.lib.ComingoutContentBuilder;
 import org.aiwolf.client.lib.Content;
@@ -24,7 +25,7 @@ import org.aiwolf.common.net.GameInfo;
 // TODO 5人人狼以外も考慮する場合
 // 霊能結果認識の実装
 // Whisperの実装
-// TODO １発言で２内容来た場合片方しか対応できない（占COと同時に占い結果言う場合とか）
+// TODO １発言で２内容来た場合片方しか対応できない（占COと同時に占い結果言う場合とか）。2文も多分うまくいかないと思う。
 public class Ear{
 	private static final String DAT_FILE = "dic/translatedMap.dat";
 
@@ -44,30 +45,29 @@ public class Ear{
 	
 	public String toProtocolForTalk(GameInfo gameInfo, Agent talker, String naturalLanguage) {
 		String key = talker + ":" + naturalLanguage;
-		
-		if(translatedMap.containsKey(key)) {
-			return translatedMap.get(key);
-		} else if(naturalLanguage.contains(Talk.SKIP)) {
-			translatedMap.put(key, Talk.SKIP);
-			return Talk.SKIP;
-		} else if(naturalLanguage.contains(Talk.OVER)) {
-			translatedMap.put(key, Talk.OVER);
-			return Talk.OVER;
-		}
-		
 		String ret = Talk.SKIP;
-		
-		try {
-			String nl = naturalLanguage;
-			
+		try {			
 			Agent questionTo = null;
 			if(naturalLanguage.startsWith(">>Agent["))
 				questionTo = Agent.getAgent(Integer.parseInt(naturalLanguage.substring(8, 10)));
 			
+			if(translatedMap.containsKey(key)) { // 履歴にある場合
+				if(questionTo != gameInfo.getAgent() || qas.containsKey(key)) // 自分宛ての問いかけでない場合か、QA履歴にある場合
+					return translatedMap.get(key); // 履歴から返す
+			} else if(naturalLanguage.contains(Talk.SKIP)) {
+				translatedMap.put(key, Talk.SKIP);
+				return Talk.SKIP;
+			} else if(naturalLanguage.contains(Talk.OVER)) {
+				translatedMap.put(key, Talk.OVER);
+				return Talk.OVER;
+			}
+			
+			String nl = naturalLanguage;
+			
 			nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			
-			Content content = talkToContent(gameInfo, talker, questionTo, Clausea.createClauseas(nl));
+			Content content = talkToContent(gameInfo, talker, questionTo, key, Clausea.createClauseas(nl));
 			if(content == null)
 				ret = Talk.SKIP;
 			else
@@ -81,7 +81,7 @@ public class Ear{
 		return ret;
 	}
 	
-	private Content talkToContent(GameInfo gameInfo, Agent talker, Agent questionTo, List<Clausea> clauseas) {
+	private Content talkToContent(GameInfo gameInfo, Agent talker, Agent questionTo, String key, List<Clausea> clauseas) {
 		Clausea roleClausea   = Clausea.findAiwolfTypeClausea(clauseas, "役職");
 		Clausea roleCoClausea = Clausea.findAiwolfTypeClausea(clauseas, "役職CO");
 		Clausea actionClausea = Clausea.findAiwolfTypeClausea(clauseas, "行為");
@@ -118,7 +118,7 @@ public class Ear{
 			
 			// ☆占い結果「Agent[04]さんは人狼です」
 			tmp = roleClausea.getKakuMap().get("ガ");
-			if(tmp != null && tmp.getAiwolfWordType() != null && tmp.getAiwolfWordType().equals("プレイヤー") && !roleClausea.getAttributes().contains("モダリティ-疑問")) {
+			if(tmp != null && tmp.getAiwolfWordType() != null && tmp.getAiwolfWordType().equals("プレイヤー") && !roleClausea.getModalities().contains("疑問")) {
 				Agent target = Agent.getAgent(Integer.parseInt(tmp.getAiwolfWordMeaning()));
 				switch (roleClausea.getAiwolfWordMeaning()) {
 				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
@@ -142,7 +142,8 @@ public class Ear{
 		if(actionClausea != null && !actionClausea.isNegative()) {
 			if(actionClausea.getAiwolfWordMeaning().equals("投票")) {
 				// ☆投票依頼「Agent[04]さんに投票してください」
-				if(actionClausea.getAttributes().contains("モダリティ-依頼Ａ")) {
+				Set<String> m = actionClausea.getModalities();
+				if(m.contains("依頼Ａ") || m.contains("勧誘") || m.contains("意志")) {
 					int agentId = -1;
 					tmp = actionClausea.getKakuMap().get("ニ");
 					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
@@ -161,11 +162,26 @@ public class Ear{
 			}
 		}
 		
-		if(questionTo == gameInfo.getAgent()) {
-			// TODO 問いかけの処理
-			// TODO 一回処理した問いかけはSkipで保存されちゃうからどうしようか。リプライ付きは保存しないようにするか、自分宛てリプはもう一回まわすようにするか。
-			// でも今は1日分まるごと回す処理してるからまずいぞ。
+		if(questionTo == gameInfo.getAgent()) { // 自分宛て問いかけの場合
+			if(
+					Clausea.findModalityClausea(clauseas, "勧誘") != null || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
+					Clausea.findModalityClausea(clauseas, "意志") != null || // 今日はAgent[01]さんに投票しましょう
+					Clausea.findModalityClausea(clauseas, "依頼Ａ") != null) { // 今日はAgent[01]さんに投票してください
+				qas.put(key, ">>" + talker + " " + talker + "さん、うーん、どうしようかな……。");
+			}
 			
+			if(Clausea.findModalityClausea(clauseas, "疑問") != null) {
+				if(roleClausea != null && roleClausea.getAiwolfWordMeaning().equals("人狼")) {
+					String main = roleClausea.getKakuMap().get("ガ").getMain();
+					if(Clausea.findMainClausea(clauseas, "誰") != null) { // 誰が人狼だと思う？
+						qas.put(key, ">>" + talker + " " + talker + "さん、僕は#さんが怪しいと思うよ。");
+					} else if(main.equals("君") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
+						qas.put(key, ">>" + talker + " " + talker + "さん、僕は人狼じゃないよ。");
+					} else {
+						qas.put(key, ">>" + talker + " " + talker + "さん、ちょっとわからないなあ。");
+					}
+				}
+			}
 		}
 		
 		return null;

@@ -35,12 +35,15 @@ public class Mouth {
 
 	private Set<String> talkedSet = null;
 	
+	private Agent todayVotedTarget = null;
+	
 	public void initialize(GameInfo gameInfo) {
 		talkedSet = new HashSet<>();
 		loadChats(new Random((new Date()).getTime() + gameInfo.getAgent().getAgentIdx() * 222));
 	}
 	
 	public void dayStart() {
+		todayVotedTarget = null;
 	}
 
 	public String toNaturalLanguageForTalk(GameInfo gameInfo, Map<Agent, Role> coMap, String protocol, Collection<String> answers) {
@@ -92,6 +95,7 @@ public class Mouth {
 				return Talk.SKIP;
 			return c.getTarget() + "さんに投票してね。";
 		case VOTE:
+			todayVotedTarget = content.getTarget();
 			return content.getTarget() + "さんに投票するよ。";
 		default:
 			return Talk.SKIP;
@@ -132,7 +136,7 @@ public class Mouth {
 		}
 
 		// 共通反応
-		if(gameInfo.getLastDeadAgentList().size() > 0) { // 襲撃死した人がいる場合
+		if(gameInfo.getLastDeadAgentList().size() > 0 && gameInfo.getDay() == 2) { // 2日目で襲撃死した人がいる場合
 			if(!talkedSet.contains("襲撃反応")){
 				talkedSet.add("襲撃反応");
 				switch ((int)(Math.random() * 5)) {
@@ -173,7 +177,12 @@ public class Mouth {
 		for(String answer: answers) { //Earから渡されたAnswer
 			if(!talkedSet.contains("answer:" + answer)){
 				talkedSet.add("answer:" + answer);
-				return answer;
+				if(todayVotedTarget != null) {
+					if(answer.startsWith(">>" + todayVotedTarget + " "))
+						return answer.replace("#さん", "あなた");
+					else
+						return answer.replace("#", todayVotedTarget.toString());
+				}
 			}
 		}
 
