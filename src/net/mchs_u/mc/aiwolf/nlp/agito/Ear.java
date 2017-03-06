@@ -64,7 +64,7 @@ public class Ear{
 			
 			String nl = naturalLanguage;
 			
-			nl.replaceFirst("^>>Agent\\[..\\] ", "");
+			nl = nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			
 			Content content = talkToContent(gameInfo, talker, questionTo, key, Clausea.createClauseas(nl));
