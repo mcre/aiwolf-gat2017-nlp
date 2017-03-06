@@ -22,26 +22,26 @@ public class Starter {
 		gameSetting.setValidateUtterance(false);
 		gameSetting.setTalkOnFirstDay(true);
 		gameSetting.setTimeLimit(5000);
-		
-        new Thread() {
-            public void run() {
-            	try {
-            		TcpipServer gameServer = new TcpipServer(port, playerNum, gameSetting);
-            		gameServer.waitForConnection();
-            		AIWolfGame game = new AIWolfGame(gameSetting, gameServer);
 
-            		for(int i = 0; i < gameNum; i++){
-            			game.setRand(new Random(i));
-            			game.setGameLogger(new FileGameLogger(new File("log/" + (new Date()).getTime() + ".txt")));
-            			game.start();
-            		}
+		new Thread() {
+			public void run() {
+				try {
+					TcpipServer gameServer = new TcpipServer(port, playerNum, gameSetting);
+					gameServer.waitForConnection();
+					AIWolfGame game = new AIWolfGame(gameSetting, gameServer);
+
+					for(int i = 0; i < gameNum; i++){
+						game.setRand(new Random(i));
+						game.setGameLogger(new FileGameLogger(new File("log/" + (new Date()).getTime() + ".txt")));
+						game.start();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-            }
-        }.start();
+			}
+		}.start();
 	}
-	
+
 	public static void startClient(String host, int port, int num) throws InstantiationException, IllegalAccessException {
 		for(int i = 0; i < num; i++) {
 			TcpipClient client = new TcpipClient(host, port);
@@ -49,9 +49,9 @@ public class Starter {
 			client.setName("m_cre");
 		}
 	}
-	
+
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, SocketTimeoutException, IOException  {
-        startServer(10000, 100);
+		startServer(10000, 100);
 		startClient("localhost", 10000, 5);
 	}
 
