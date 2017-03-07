@@ -12,20 +12,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mychaelstyle.nlp.KNP;
 
-public class Clausea {
+public class Clause {
 	private int id = -1;
 	private String text = null;
 	private String main = null;
 	private Set<String> signages = null;
 	private String target = null;
-	private Clausea child = null;
-	private Set<Clausea> parents = null;
-	private Clausea paraForward = null;
-	private Clausea paraBack = null;
+	private Clause child = null;
+	private Set<Clause> parents = null;
+	private Clause paraForward = null;
+	private Clause paraBack = null;
 	
 	private Set<String> modalities = null;
 	private String kaku = null;
-	private Map<String, Clausea> kakuMap = null;
+	private Map<String, Clause> kakuMap = null;
 	
 	private Set<String> attributes = null;
 	
@@ -33,7 +33,7 @@ public class Clausea {
 	private String aiwolfWordMeaning = null;
 	private boolean negative = false;
 	
-	private Clausea(int id, String text, String main, String target) {
+	private Clause(int id, String text, String main, String target) {
 		this.id = id;
 		this.text = text;
 		this.main = main;
@@ -73,15 +73,15 @@ public class Clausea {
 			modalities.add(att.replace("モダリティ-", ""));
 	}
 	
-	private void createKakuMap(List<Clausea> clauseas) {
+	private void createKakuMap(List<Clause> clauses) {
 		for(String att: attributes) {
 			if(att.startsWith("{格関係")) {
 				//TODO 本来は親だけをたどるべきなのだけど実装が面倒そうなので・・・
 				String[] sp = att.replace("}", "").split(":");
-				Clausea c = null;
-				for(Clausea clausea: clauseas) {
-					if(clausea.kaku != null && clausea.kaku.equals(sp[1]) && clausea.signages.contains(sp[2])){
-						c = clausea;
+				Clause c = null;
+				for(Clause clause: clauses) {
+					if(clause.kaku != null && clause.kaku.equals(sp[1]) && clause.signages.contains(sp[2])){
+						c = clause;
 						break;
 					}
 				}
@@ -90,61 +90,61 @@ public class Clausea {
 		}
 	}
 	
-	public static List<Clausea> createClauseas(String text) throws IOException, InterruptedException {
-		List<Clausea> clauseas = new ArrayList<>();
+	public static List<Clause> createClauseas(String text) throws IOException, InterruptedException {
+		List<Clause> clauses = new ArrayList<>();
 		
 		KNP knp = new KNP();
 		ObjectNode root = knp.parse(text);
 		
 		for(JsonNode clauseaNode: root.get("clauseas")){
-			Clausea clausea = new Clausea(
-					clauseas.size(),
+			Clause clause = new Clause(
+					clauses.size(),
 					clauseaNode.get("clausea").asText(),
 					clauseaNode.get("attributes").findValues("正規化代表表記").get(0).get(0).asText(),
 					clauseaNode.get("target").asText());
 			
 			for(JsonNode clAtt: clauseaNode.get("attributes"))
-				clausea.addAttribute(clAtt.toString());
+				clause.addAttribute(clAtt.toString());
 			
 			for(JsonNode phraseNode: clauseaNode.get("phrases")) {
 				for(JsonNode clPhr: phraseNode.get("attributes"))
-					clausea.addAttribute(clPhr.toString());
+					clause.addAttribute(clPhr.toString());
 				
 				for(JsonNode morphemeNode: phraseNode.get("morphemes")) {
-					clausea.addSignage(morphemeNode.get("signage").asText());
+					clause.addSignage(morphemeNode.get("signage").asText());
 					for(JsonNode clMor: morphemeNode.get("attributes"))
-						clausea.addAttribute(clMor.toString());
+						clause.addAttribute(clMor.toString());
 				}
 			}
 			
-			clauseas.add(clausea);
+			clauses.add(clause);
 		}
 		
-		for(Clausea clausea: clauseas) { // target Pの処理
-			if(!clausea.getTarget().endsWith("P"))
+		for(Clause clause: clauses) { // target Pの処理
+			if(!clause.getTarget().endsWith("P"))
 				continue;
 			
-			int id = Integer.parseInt(clausea.getTarget().replace("P", ""));
-			clausea.paraForward = clauseas.get(id);
-			clauseas.get(id).paraBack = clausea;
+			int id = Integer.parseInt(clause.getTarget().replace("P", ""));
+			clause.paraForward = clauses.get(id);
+			clauses.get(id).paraBack = clause;
 		}
 		
-		for(Clausea clausea: clauseas) { // target Dの処理
-			if(!clausea.getTarget().endsWith("D"))
+		for(Clause clause: clauses) { // target Dの処理
+			if(!clause.getTarget().endsWith("D"))
 				continue;
 			
-			int id = Integer.parseInt(clausea.getTarget().replace("D", ""));
+			int id = Integer.parseInt(clause.getTarget().replace("D", ""));
 			if(id > -1) {
-				clausea.child = clauseas.get(id);
-				clauseas.get(id).parents.add(clausea);
+				clause.child = clauses.get(id);
+				clauses.get(id).parents.add(clause);
 			}
 		}
 		
-		for(Clausea clausea: clauseas) {
-			clausea.createKakuMap(clauseas);
+		for(Clause clause: clauses) {
+			clause.createKakuMap(clauses);
 		}
 		
-		return clauseas;
+		return clauses;
 	}
 
 	
@@ -168,19 +168,19 @@ public class Clausea {
 		return signages;
 	}
 
-	public Clausea getChild() {
+	public Clause getChild() {
 		return child;
 	}
 
-	public Set<Clausea> getParents() {
+	public Set<Clause> getParents() {
 		return parents;
 	}
 
-	public Clausea getParaForward() {
+	public Clause getParaForward() {
 		return paraForward;
 	}
 
-	public Clausea getParaBack() {
+	public Clause getParaBack() {
 		return paraBack;
 	}
 
@@ -188,7 +188,7 @@ public class Clausea {
 		return kaku;
 	}
 
-	public Map<String, Clausea> getKakuMap() {
+	public Map<String, Clause> getKakuMap() {
 		return kakuMap;
 	}
 
@@ -212,31 +212,31 @@ public class Clausea {
 		return negative;
 	}
 	
-	public static Clausea findMainClausea(List<Clausea> clauseas, String main) {
-		for(Clausea clausea: clauseas)
-			if(clausea.main.equals(main))
-				return clausea;
+	public static Clause findMainClausea(List<Clause> clauses, String main) {
+		for(Clause clause: clauses)
+			if(clause.main.equals(main))
+				return clause;
 		return null;
 	}
 	
-	public static Clausea findModalityClausea(List<Clausea> clauseas, String modality) {
-		for(Clausea clausea: clauseas)
-			if(clausea.modalities.contains(modality))
-				return clausea;
+	public static Clause findModalityClausea(List<Clause> clauses, String modality) {
+		for(Clause clause: clauses)
+			if(clause.modalities.contains(modality))
+				return clause;
 		return null;
 	}	
 	
-	public static Clausea findAttributeClausea(List<Clausea> clauseas, String attribute) {
-		for(Clausea clausea: clauseas)
-			if(clausea.attributes.contains(attribute))
-				return clausea;
+	public static Clause findAttributeClausea(List<Clause> clauses, String attribute) {
+		for(Clause clause: clauses)
+			if(clause.attributes.contains(attribute))
+				return clause;
 		return null;
 	}
 	
-	public static Clausea findAiwolfTypeClausea(List<Clausea> clauseas, String type) {
-		for(Clausea clausea: clauseas)
-			if(clausea.aiwolfWordType != null && clausea.aiwolfWordType.equals(type))
-				return clausea;
+	public static Clause findAiwolfTypeClausea(List<Clause> clauses, String type) {
+		for(Clause clause: clauses)
+			if(clause.aiwolfWordType != null && clause.aiwolfWordType.equals(type))
+				return clause;
 		return null;
 	}
 
@@ -246,7 +246,7 @@ public class Clausea {
 		sb.append("* " + text);
 		if(child != null)
 			sb.append(" ( -> " + child.text + " )");
-		for(Clausea parent: parents)
+		for(Clause parent: parents)
 			sb.append(" ( <- " + parent.text + " )");
 		
 		if(paraForward != null)
@@ -294,7 +294,7 @@ public class Clausea {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Clausea other = (Clausea) obj;
+		Clause other = (Clause) obj;
 		if (id != other.id)
 			return false;
 		return true;
@@ -331,9 +331,12 @@ public class Clausea {
 		//talk = "君が人狼なんでしょう？";
 		//talk = "人狼は誰だと思う？";
 		//talk = "君が犯人なんだろう？";
+		//talk = "Agent[01]に投票しようかな";
+		talk = "Ａｇｅｎｔ［０１］は人狼でした";
+
 		
-		List<Clausea> list = Clausea.createClauseas(talk);
-		for(Clausea c: list) {
+		List<Clause> list = Clause.createClauseas(talk);
+		for(Clause c: list) {
 			System.out.println(c);
 		}
 		

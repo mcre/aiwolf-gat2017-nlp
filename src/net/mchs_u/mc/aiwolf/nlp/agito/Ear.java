@@ -67,7 +67,7 @@ public class Ear{
 			nl = nl.replaceFirst("^>>Agent\\[..\\] ", "");
 			nl = hankakuToZenkaku(nl);
 			
-			Content content = talkToContent(gameInfo, talker, questionTo, key, Clausea.createClauseas(nl));
+			Content content = talkToContent(gameInfo, talker, questionTo, key, Clause.createClauseas(nl));
 			if(content == null)
 				ret = Talk.SKIP;
 			else
@@ -81,12 +81,12 @@ public class Ear{
 		return ret;
 	}
 	
-	private Content talkToContent(GameInfo gameInfo, Agent talker, Agent questionTo, String key, List<Clausea> clauseas) {
-		Clausea roleClausea   = Clausea.findAiwolfTypeClausea(clauseas, "役職");
-		Clausea roleCoClausea = Clausea.findAiwolfTypeClausea(clauseas, "役職CO");
-		Clausea actionClausea = Clausea.findAiwolfTypeClausea(clauseas, "行為");
-		Clausea playerClausea = Clausea.findAiwolfTypeClausea(clauseas, "プレイヤー");
-		Clausea tmp = null;
+	private Content talkToContent(GameInfo gameInfo, Agent talker, Agent questionTo, String key, List<Clause> clauses) {
+		Clause roleClausea   = Clause.findAiwolfTypeClausea(clauses, "役職");
+		Clause roleCoClausea = Clause.findAiwolfTypeClausea(clauses, "役職CO");
+		Clause actionClausea = Clause.findAiwolfTypeClausea(clauses, "行為");
+		Clause playerClausea = Clause.findAiwolfTypeClausea(clauses, "プレイヤー");
+		Clause tmp = null;
 		
 		if(playerClausea != null && roleClausea != null && actionClausea != null) {
 			// ☆占い結果「Agent[04]さんを占ったら人狼でした」「昨日の占い結果です。Agent[04]さんは人狼でした」
@@ -118,7 +118,7 @@ public class Ear{
 			
 			// ☆占い結果「Agent[04]さんは人狼です」
 			tmp = roleClausea.getKakuMap().get("ガ");
-			Clausea child = roleClausea.getChild();
+			Clause child = roleClausea.getChild();
 			if(tmp != null && tmp.getAiwolfWordType() != null && 
 					tmp.getAiwolfWordType().equals("プレイヤー") && 
 					!roleClausea.getModalities().contains("疑問") &&
@@ -170,16 +170,16 @@ public class Ear{
 		
 		if(questionTo == gameInfo.getAgent()) { // 自分宛て問いかけの場合
 			if(
-					Clausea.findModalityClausea(clauseas, "勧誘") != null || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
-					Clausea.findModalityClausea(clauseas, "意志") != null || // 今日はAgent[01]さんに投票しましょう
-					Clausea.findModalityClausea(clauseas, "依頼Ａ") != null) { // 今日はAgent[01]さんに投票してください
+					Clause.findModalityClausea(clauses, "勧誘") != null || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
+					Clause.findModalityClausea(clauses, "意志") != null || // 今日はAgent[01]さんに投票しましょう
+					Clause.findModalityClausea(clauses, "依頼Ａ") != null) { // 今日はAgent[01]さんに投票してください
 				qas.put(key, ">>" + talker + " " + talker + "さん、うーん、どうしようかな……。");
 			}
 			
-			if(Clausea.findModalityClausea(clauseas, "疑問") != null) {
+			if(Clause.findModalityClausea(clauses, "疑問") != null) {
 				if(roleClausea != null && roleClausea.getAiwolfWordMeaning().equals("人狼")) {
 					String main = roleClausea.getKakuMap().get("ガ").getMain();
-					if(Clausea.findMainClausea(clauseas, "誰") != null) { // 誰が人狼だと思う？
+					if(Clause.findMainClausea(clauses, "誰") != null) { // 誰が人狼だと思う？
 						qas.put(key, ">>" + talker + " " + talker + "さん、僕は#さんが怪しいと思うよ。");
 					} else if(main.equals("君") || main.equals("あなた") || main.equals("御前")) { // あなたが人狼なんでしょう？, あなたが人狼なんですか！？
 						qas.put(key, ">>" + talker + " " + talker + "さん、僕は人狼じゃないよ。");

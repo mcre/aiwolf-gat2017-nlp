@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mychaelstyle.nlp.KNP;
 
-import net.mchs_u.mc.aiwolf.nlp.agito.Clausea;
+import net.mchs_u.mc.aiwolf.nlp.agito.Clause;
 
 public class KNPChecker {
 	
@@ -170,7 +170,7 @@ public class KNPChecker {
 		System.out.println("---------");
 		verySimple(talk);
 		System.out.println("---------");
-		for(Clausea c: Clausea.createClauseas(talk))
+		for(Clause c: Clause.createClauseas(talk))
 			System.out.println(c);
 	}
 
