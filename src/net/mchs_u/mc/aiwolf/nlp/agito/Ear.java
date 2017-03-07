@@ -118,7 +118,11 @@ public class Ear{
 			
 			// ☆占い結果「Agent[04]さんは人狼です」
 			tmp = roleClausea.getKakuMap().get("ガ");
-			if(tmp != null && tmp.getAiwolfWordType() != null && tmp.getAiwolfWordType().equals("プレイヤー") && !roleClausea.getModalities().contains("疑問")) {
+			Clausea child = roleClausea.getChild();
+			if(tmp != null && tmp.getAiwolfWordType() != null && 
+					tmp.getAiwolfWordType().equals("プレイヤー") && 
+					!roleClausea.getModalities().contains("疑問") &&
+					!(child != null && child.getMain().equals("思う"))) { // 「人狼だと思う」の回避
 				Agent target = Agent.getAgent(Integer.parseInt(tmp.getAiwolfWordMeaning()));
 				switch (roleClausea.getAiwolfWordMeaning()) {
 				case "人狼":		return new Content(new DivinedResultContentBuilder(target, Species.WEREWOLF));
