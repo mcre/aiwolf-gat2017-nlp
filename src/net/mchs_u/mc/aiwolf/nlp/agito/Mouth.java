@@ -96,7 +96,10 @@ public class Mouth {
 			return c.getTarget() + "さんに投票してね。";
 		case VOTE:
 			todayVotedTarget = content.getTarget();
-			return content.getTarget() + "さんに投票するよ。";
+			switch ((int)(Math.random() * 2)) {
+			case 0: return content.getTarget() + "さんに投票するよ。";
+			case 1: return content.getTarget() + "さんに投票しようかな。";
+			}
 		default:
 			return Talk.SKIP;
 		}

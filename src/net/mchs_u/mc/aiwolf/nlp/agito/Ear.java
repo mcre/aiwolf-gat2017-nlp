@@ -144,19 +144,21 @@ public class Ear{
 				// ☆投票依頼「Agent[04]さんに投票してください」
 				Set<String> m = actionClausea.getModalities();
 				if(m.contains("依頼Ａ") || m.contains("勧誘") || m.contains("意志")) {
-					int agentId = -1;
-					tmp = actionClausea.getKakuMap().get("ニ");
-					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
-						agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
-					
-					tmp = actionClausea.getKakuMap().get("ヲ");
-					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
-						agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
+					if(!(m.contains("勧誘") && m.contains("意志"))) { // 「投票しようかな」のときにこの2つ両方が立つので回避する
+						int agentId = -1;
+						tmp = actionClausea.getKakuMap().get("ニ");
+						if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
+							agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
 						
-					if(agentId >= 0) {
-						Agent target = Agent.getAgent(agentId);
-						if(target != null)	
-							return new Content(new RequestContentBuilder(null, new Content(new VoteContentBuilder(target))));
+						tmp = actionClausea.getKakuMap().get("ヲ");
+						if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
+							agentId = Integer.parseInt(tmp.getAiwolfWordMeaning());
+							
+						if(agentId >= 0) {
+							Agent target = Agent.getAgent(agentId);
+							if(target != null)	
+								return new Content(new RequestContentBuilder(null, new Content(new VoteContentBuilder(target))));
+						}
 					}
 				}	
 			}
