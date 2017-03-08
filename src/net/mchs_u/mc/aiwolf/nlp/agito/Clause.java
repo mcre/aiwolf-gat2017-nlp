@@ -90,23 +90,23 @@ public class Clause {
 		}
 	}
 	
-	public static List<Clause> createClauseas(String text) throws IOException, InterruptedException {
+	public static List<Clause> createClauses(String text) throws IOException, InterruptedException {
 		List<Clause> clauses = new ArrayList<>();
 		
 		KNP knp = new KNP();
 		ObjectNode root = knp.parse(text);
 		
-		for(JsonNode clauseaNode: root.get("clauseas")){
+		for(JsonNode clauseNode: root.get("clauseas")){
 			Clause clause = new Clause(
 					clauses.size(),
-					clauseaNode.get("clausea").asText(),
-					clauseaNode.get("attributes").findValues("正規化代表表記").get(0).get(0).asText(),
-					clauseaNode.get("target").asText());
+					clauseNode.get("clausea").asText(),
+					clauseNode.get("attributes").findValues("正規化代表表記").get(0).get(0).asText(),
+					clauseNode.get("target").asText());
 			
-			for(JsonNode clAtt: clauseaNode.get("attributes"))
+			for(JsonNode clAtt: clauseNode.get("attributes"))
 				clause.addAttribute(clAtt.toString());
 			
-			for(JsonNode phraseNode: clauseaNode.get("phrases")) {
+			for(JsonNode phraseNode: clauseNode.get("phrases")) {
 				for(JsonNode clPhr: phraseNode.get("attributes"))
 					clause.addAttribute(clPhr.toString());
 				
@@ -212,28 +212,28 @@ public class Clause {
 		return negative;
 	}
 	
-	public static Clause findMainClausea(List<Clause> clauses, String main) {
+	public static Clause findMainClause(List<Clause> clauses, String main) {
 		for(Clause clause: clauses)
 			if(clause.main.equals(main))
 				return clause;
 		return null;
 	}
 	
-	public static Clause findModalityClausea(List<Clause> clauses, String modality) {
+	public static Clause findModalityClause(List<Clause> clauses, String modality) {
 		for(Clause clause: clauses)
 			if(clause.modalities.contains(modality))
 				return clause;
 		return null;
 	}	
 	
-	public static Clause findAttributeClausea(List<Clause> clauses, String attribute) {
+	public static Clause findAttributeClause(List<Clause> clauses, String attribute) {
 		for(Clause clause: clauses)
 			if(clause.attributes.contains(attribute))
 				return clause;
 		return null;
 	}
 	
-	public static Clause findAiwolfTypeClausea(List<Clause> clauses, String type) {
+	public static Clause findAiwolfTypeClause(List<Clause> clauses, String type) {
 		for(Clause clause: clauses)
 			if(clause.aiwolfWordType != null && clause.aiwolfWordType.equals(type))
 				return clause;
@@ -335,7 +335,7 @@ public class Clause {
 		talk = "Ａｇｅｎｔ［０１］は人狼でした";
 
 		
-		List<Clause> list = Clause.createClauseas(talk);
+		List<Clause> list = Clause.createClauses(talk);
 		for(Clause c: list) {
 			System.out.println(c);
 		}

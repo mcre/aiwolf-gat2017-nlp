@@ -118,7 +118,7 @@ public class KNPChecker {
 		}
 	}
 	
-	private static String getTargetClausea(String target, JsonNode clauseas) {		
+	private static String getTargetClause(String target, JsonNode clauses) {		
 		
 		if(target.endsWith("D")) {
 			int id = Integer.parseInt(target.replace("D", ""));
@@ -126,11 +126,11 @@ public class KNPChecker {
 				// return " ( <= " + node.get(-id).get("clausea") + " ) "; // 引き算しなきゃかも
 				return "";
 			} else {
-				return " ( => " + clauseas.get(id).get("clausea") + " ) ";
+				return " ( => " + clauses.get(id).get("clausea") + " ) ";
 			}
 		} else if(target.endsWith("P")) {
 			int id = Integer.parseInt(target.replace("P", ""));
-			return " ( || " + clauseas.get(id).get("clausea") + " ) ";
+			return " ( || " + clauses.get(id).get("clausea") + " ) ";
 		} else {
 			return " ( " + target + " ) ";
 		}
@@ -140,18 +140,18 @@ public class KNPChecker {
 	public static void verySimple(String text) throws IOException, InterruptedException {
 		KNP knp = new KNP();
 		ObjectNode root = knp.parse(text);
-		JsonNode clauseas = root.get("clauseas");
+		JsonNode clauses = root.get("clauseas");
 
-		Iterator<JsonNode> clauseasIterator =  clauseas.elements();
+		Iterator<JsonNode> clausesIterator =  clauses.elements();
 		
 		int i = 1;
-		while(clauseasIterator.hasNext()) {		
-			JsonNode clausea = clauseasIterator.next();
-			System.out.print((i++) + ": " + clausea.get("clausea").asText());
-			System.out.println(getTargetClausea(clausea.get("target").asText(), clauseas));
-			System.out.println("   " + clausea.get("attributes"));
+		while(clausesIterator.hasNext()) {		
+			JsonNode clause = clausesIterator.next();
+			System.out.print((i++) + ": " + clause.get("clausea").asText());
+			System.out.println(getTargetClause(clause.get("target").asText(), clauses));
+			System.out.println("   " + clause.get("attributes"));
 
-			Iterator<JsonNode> phrasesIterator = clausea.get("phrases").elements();
+			Iterator<JsonNode> phrasesIterator = clause.get("phrases").elements();
 			while(phrasesIterator.hasNext()) {
 				JsonNode phrase = phrasesIterator.next();				
 				System.out.println("        " + phrase.get("phrase").asText());
@@ -170,7 +170,7 @@ public class KNPChecker {
 		System.out.println("---------");
 		verySimple(talk);
 		System.out.println("---------");
-		for(Clause c: Clause.createClauseas(talk))
+		for(Clause c: Clause.createClauses(talk))
 			System.out.println(c);
 	}
 
