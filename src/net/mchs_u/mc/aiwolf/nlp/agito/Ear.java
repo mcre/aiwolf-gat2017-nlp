@@ -171,7 +171,7 @@ public class Ear{
 					Clause.findModalityClause(clauses, "勧誘") != null || // 一緒に遊ぼうよ。, 今日はAgent[01]さんに投票しましょうよ
 					Clause.findModalityClause(clauses, "意志") != null || // 今日はAgent[01]さんに投票しましょう
 					Clause.findModalityClause(clauses, "依頼Ａ") != null) { // 今日はAgent[01]さんに投票してください
-				qas.put(key, ">>" + talker + " " + talker + "さん、うーん、どうしようかな……。");
+				qas.put(key, ">>" + talker + " " + talker + "さん、うーん……。");
 			}
 			
 			if(Clause.findModalityClause(clauses, "疑問") != null) {
