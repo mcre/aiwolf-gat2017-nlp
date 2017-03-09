@@ -147,7 +147,7 @@ public class Ear{
 			if(actionClause.getAiwolfWordMeaning().equals("投票")) {
 				// ☆投票依頼「Agent[04]さんに投票してください」
 				Set<String> m = actionClause.getModalities();
-				if(m.contains("依頼Ａ") || m.contains("勧誘")) {
+				if((m.contains("依頼Ａ") || m.contains("勧誘")) && !m.contains("意志")) {
 					int agentId = -1;
 					tmp = actionClause.getKakuMap().get("ニ");
 					if(tmp != null && tmp.getAiwolfWordType().equals("プレイヤー"))
