@@ -33,6 +33,23 @@
   + [mcre/aiwolf-gat2017](https://github.com/mcre/aiwolf-gat2017)をjarに固めたもの
   + 0.4.4対応エージェントであればどんなプレイヤーでもなんらかの動作はするようにはなっているはずです。(その場合```McreNlpPlayer```クラスで指定しているプレイヤーを変更してください)
 
+## クラス説明
+
+* プレイヤー本体
+  * net.mchs_u.mc.aiwolf.nlp.agito.McreNlpPlayer
+
+* mainメソッド
+  + net.mchs_u.mc.aiwolf.nlp.starter.Starter
+    - サーバとクライアント5体が一発で起動します
+  + net.mchs_u.mc.aiwolf.nlp.agito.Clause
+    - 文章を解析してClauseクラスに格納された結果を確認できます
+  + net.mchs_u.mc.aiwolf.nlp.util.KNPChecker
+    - Clauseクラスに格納されるまえの詳細な解析結果を確認できます
+  + net.mchs_u.mc.aiwolf.nlp.util.LogConverter
+    - サーバから吐き出されるlogファイルを読みやすく変換できます
+  + net.mchs_u.mc.aiwolf.nlp.util.TransratedMapChecker
+    - 自然言語をプロトコルに変換した履歴を確認できます
+
 ## 連絡先
 * [@m_cre](https://twitter.com/m_cre)
 
