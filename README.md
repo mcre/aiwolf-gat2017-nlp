@@ -3,16 +3,20 @@
 
 [人狼知能プレ大会@GAT2017](http://aiwolf.org/event-2/gat2017) 自然言語処理部門の出場エージェントです。
 
+## 資料
+
+* [pdf](http://www.mchs-u.net/mc/wordpress/wp-content/uploads/2017/03/d8322ec5d4a213605dbb218023bb8b2b.pdf)
+
 ## 必要ライブラリ等
 
 ### OSにインストールするもの
 * juman
   - ```dic/makedic.sh```を参考に辞書をコンパイルしてください
   - [このへん](http://d.hatena.ne.jp/knaka20blue/20110320/1300627864)を参考に```~/.jumanrc```に```dic```(フルパスで)を設定してください。
-  - インストール先が ```/usr/local/bin/juman``` ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
+  - インストール先が```/usr/local/bin/juman```ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
 
 * knp
-  - インストール先が ```/usr/local/bin/knp``` ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
+  - インストール先が```/usr/local/bin/knp```ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
 
 ### ライブラリ
 * aiwolf-client.jar (0.4.4)
@@ -27,7 +31,7 @@
   + [mychaelstyle/java-juman-knp](https://github.com/mychaelstyle/java-juman-knp) を(勝手に)jarに固めたもの
 * McrePlayer.jar
   + [mcre/aiwolf-gat2017](https://github.com/mcre/aiwolf-gat2017)をjarに固めたもの
-  + 0.4.4対応エージェントであればどんなプレイヤーでもなんらかの動作はするようにはなっているはずです。(その場合 ```McreNlpPlayer```クラスで指定しているプレイヤーを変更してください)
+  + 0.4.4対応エージェントであればどんなプレイヤーでもなんらかの動作はするようにはなっているはずです。(その場合```McreNlpPlayer```クラスで指定しているプレイヤーを変更してください)
 
 ## 連絡先
 * [@m_cre](https://twitter.com/m_cre)
