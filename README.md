@@ -3,22 +3,28 @@
 
 [人狼知能プレ大会@GAT2017](http://aiwolf.org/event-2/gat2017) 自然言語処理部門の出場エージェントです。
 
-## 資料
+## プログラム解説
 
-* [pdf](http://www.mchs-u.net/mc/wordpress/wp-content/uploads/2017/03/d8322ec5d4a213605dbb218023bb8b2b.pdf)
+* [pdf](/doc/20170309_slide.pdf)
 
-## 必要ライブラリ等
+## 動作環境
+
+* macOS (Sierra)
+  + Windowsでもjuman, knp を呼び出す部分をうまく変えれば動くと思います。
+* jdk (8)
 
 ### OSにインストールするもの
-* juman
-  - ```dic/makedic.sh```を参考に辞書をコンパイルしてください
-  - [このへん](http://d.hatena.ne.jp/knaka20blue/20110320/1300627864)を参考に```~/.jumanrc```に```dic```(フルパスで)を設定してください。
-  - インストール先が```/usr/local/bin/juman```ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
 
-* knp
-  - インストール先が```/usr/local/bin/knp```ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
+* juman (7.01)
+  + ```dic/makedic.sh```を参考に辞書をコンパイルしてください
+  + [このへん](http://d.hatena.ne.jp/knaka20blue/20110320/1300627864)を参考に```~/.jumanrc```に```dic```(フルパスで)を設定してください。
+  + インストール先が```/usr/local/bin/juman```ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
 
-### ライブラリ
+* knp (4.16)
+  + インストール先が```/usr/local/bin/knp```ではない場合はClauseクラスから呼んでいるKNPのコンストラクタの記載を変更する必要があります。
+
+### 必要ライブラリ等
+
 * aiwolf-client.jar (0.4.4)
 * aiwolf-common.jar (0.4.4)
 * aiwolf-server.jar (0.4.4)
@@ -29,8 +35,7 @@
 * jackson-databind-2.8.5.jar
 * java-juman-knp.jar
   + [mychaelstyle/java-juman-knp](https://github.com/mychaelstyle/java-juman-knp) を(勝手に)jarに固めたもの
-* McrePlayer.jar
-  + [mcre/aiwolf-gat2017](https://github.com/mcre/aiwolf-gat2017)をjarに固めたもの
+* [McrePlayer.jar](https://github.com/mcre/aiwolf-gat2017/blob/master/McrePlayer.jar)
   + 0.4.4対応エージェントであればどんなプレイヤーでもなんらかの動作はするようにはなっているはずです。(その場合```McreNlpPlayer```クラスで指定しているプレイヤーを変更してください)
 
 ## クラス説明
@@ -51,8 +56,11 @@
     - 自然言語をプロトコルに変換した履歴を確認できます
 
 ## 連絡先
-* [@m_cre](https://twitter.com/m_cre)
+
+* [twitter: @m_cre](https://twitter.com/m_cre)
+* [blog](http://www.mchs-u.net)
 
 ## License
+
 * MIT
   + see LICENSE
