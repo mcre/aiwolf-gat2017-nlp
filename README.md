@@ -58,7 +58,7 @@
 ## 連絡先
 
 * [twitter: @m_cre](https://twitter.com/m_cre)
-* [blog](http://www.mchs-u.net)
+* [blog](http://www.mchs-u.net/mc/)
 
 ## License
 
